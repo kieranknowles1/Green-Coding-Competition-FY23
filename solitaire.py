@@ -1,7 +1,7 @@
 from typing import Optional
 
 from card_elements import Card, Deck, Pile
-from codecarbon import EmissionsTracker
+from codecarbon import EmissionsTracker # type: ignore
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -12,17 +12,8 @@ if True:
 
     class Game:
         colors = ["red", "black"]
-        signs = ["diamond", "spades", "hearts", "clubs"]
 
         list_of_values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
-
-        print("The cards in your deck are:")
-        for i in list_of_values:
-            for x in signs:
-                for y in colors:
-                    print("Card: " + i + " Color: " + y + " Symbol: " + x)
-
-
 
         suits = { #keys are unicode symbols for suits
             u'\u2660': "black",
@@ -31,15 +22,20 @@ if True:
             u'\u2666': "red",
         }
 
+        print("The cards in your deck are:")
+        for i in list_of_values:
+            for x in suits.keys():
+                for y in colors:
+                    print("Card: " + i + " Color: " + y + " Symbol: " + x)
+
         numPlayPiles = 7
 
         def __init__(self):
-            self.list_of_cards = [Card(value, suit) for value in range(1, 14) for suit in ["Diamonds", "Hearts", "Clubs", "Spades"]]
             self.deck = Deck(self.list_of_values,self.suits)
             self.playPiles: list[Pile] = []
             for i in range(self.numPlayPiles):
                 thisPile = Pile()
-                [thisPile.addCard(self.deck.takeFirstCard(flip=False)) for j in range(i+1)]
+                [thisPile.addCard(self.deck.takeFirstCard(flip=False)) for _ in range(i+1)]
                 thisPile.flipFirstCard()
                 self.playPiles.append(thisPile)
             self.blockPiles = {suit: Pile() for suit in self.suits}
@@ -53,7 +49,7 @@ if True:
             }
             return returnObject
 
-        def checkCardOrder(self,higherCard,lowerCard):
+        def checkCardOrder(self,higherCard: Card, lowerCard: Card):
             suitsDifferent = self.suits[higherCard.suit] != self.suits[lowerCard.suit]
             valueConsecutive = self.list_of_values[self.list_of_values.index(higherCard.value)-1] == lowerCard.value
             return suitsDifferent and valueConsecutive
@@ -61,7 +57,7 @@ if True:
         def checkIfCompleted(self):
             deckEmpty = len(self.deck.cards)==0
             pilesEmpty = all(len(pile.cards)==0 for pile in self.playPiles)
-            blocksFull = all(len(pile.cards)==13 for suit,pile in self.blockPiles.items())
+            blocksFull = all(len(pile.cards)==13 for pile in self.blockPiles.values())
             return deckEmpty and pilesEmpty and blocksFull
 
         def addToBlock(self, card: Optional[Card]):
@@ -81,7 +77,7 @@ if True:
                 else:
                     return False
 
-        def takeTurn(self, verbose=False):
+        def takeTurn(self, verbose: bool = False):
 
             #Pre: flip up unflipped pile end cards -> do this automatically
             [pile.cards[0].flip() for pile in self.playPiles if len(pile.cards)>0 and not pile.cards[0].flipped]
@@ -114,7 +110,8 @@ if True:
                                 print("Moving {0} from Pile to Empty Pile".format(str(card_added)))
                             return True
 
-                    if self.deck.getFirstCard() is not None and self.deck.getFirstCard().value == "K":
+                    first = self.deck.getFirstCard()
+                    if first is not None and first.value == "K":
                         card_added = self.deck.takeFirstCard()
                         pile.addCard(card_added)
                         if verbose:
@@ -126,7 +123,7 @@ if True:
             #4: add drawn card to playPiles
             for pile in self.playPiles:
                 if len(pile.cards)>0 and self.deck.getFirstCard() is not None:
-                    if self.checkCardOrder(pile.cards[0],self.deck.getFirstCard()):
+                    if self.checkCardOrder(pile.cards[0], self.deck.getFirstCard()):
                         card_added = self.deck.takeFirstCard()
                         pile.addCard(card_added)
                         if verbose:
@@ -170,7 +167,7 @@ if True:
             return False
 
 
-        def simulate(self, draw: bool = False, verbose: bool = False):
+        def simulate(self, draw: bool = False, verbose: bool = False) -> None:
 
             # clear cache if last turn was not card draw
             if not draw:
