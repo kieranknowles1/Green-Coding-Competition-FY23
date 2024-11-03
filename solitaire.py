@@ -4,6 +4,9 @@ from card_elements import Card, Deck, Pile
 # from codecarbon import EmissionsTracker # type: ignore
 import pprint
 
+import sys
+sys.stdout = None
+
 pp = pprint.PrettyPrinter(indent=4)
 
 
@@ -66,13 +69,13 @@ if True:
             elif len(self.blockPiles[card.suit].cards)>0:
                 highest_value = self.blockPiles[card.suit].cards[-1].value
                 if self.list_of_values[self.list_of_values.index(highest_value)+1] == card.value:
-                    self.blockPiles[card.suit].cards.insert(0,card)
+                    self.blockPiles[card.suit].cards.append(card)
                     return True
                 else:
                     return False
             else:
                 if card.value=="A":
-                    self.blockPiles[card.suit].cards.insert(0,card)
+                    self.blockPiles[card.suit].cards.append(card)
                     return True
                 else:
                     return False
