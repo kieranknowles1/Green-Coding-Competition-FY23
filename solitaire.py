@@ -64,7 +64,7 @@ if True:
             if card is None:
                 return False
             elif len(self.blockPiles[card.suit].cards)>0:
-                highest_value = self.blockPiles[card.suit].cards[0].value
+                highest_value = self.blockPiles[card.suit].cards[-1].value
                 if self.list_of_values[self.list_of_values.index(highest_value)+1] == card.value:
                     self.blockPiles[card.suit].cards.insert(0,card)
                     return True
@@ -81,18 +81,16 @@ if True:
 
             #Pre: flip up unflipped pile end cards -> do this automatically
             for pile in self.playPiles:
-                if len(pile.cards) and pile.cards[0].flipped == False:
+                if len(pile.cards) and pile.cards[-1].flipped == False:
                     pile.flipFirstCard()
 
             #1: check if there are any play pile cards you can play to block piles
             for pile in self.playPiles:
-                if len(pile.cards) > 0 and self.addToBlock(pile.cards[0]):
+                if len(pile.cards) > 0 and self.addToBlock(pile.cards[-1]):
                     card_added = pile.cards.pop(0)
                     if verbose:
                         print("Adding play pile card to block: {0}".format(str(card_added)))
                     return True
-                else:
-                    print("Pile has cards")
 
             #2: check if cards in deck can be added
             if self.addToBlock(self.deck.getFirstCard()):
@@ -105,7 +103,7 @@ if True:
             for pile in self.playPiles:
                 if len(pile.cards)==0: #pile has no cards
                     for pile2 in self.playPiles:
-                        if len(pile2.cards)>1 and pile2.cards[0].value == "K":
+                        if len(pile2.cards)>1 and pile2.cards[-1].value == "K":
                             card_added = pile2.cards.pop(0)
                             pile.addCard(card_added)
                             if verbose:
@@ -119,20 +117,16 @@ if True:
                         if verbose:
                             print("Moving {0} from Deck to Empty Pile".format(str(card_added)))
                         return True
-                else:
-                    print("Pile has cards")
 
             #4: add drawn card to playPiles
             for pile in self.playPiles:
                 if len(pile.cards)>0 and self.deck.getFirstCard() is not None:
-                    if self.checkCardOrder(pile.cards[0], self.deck.getFirstCard()):
+                    if self.checkCardOrder(pile.cards[-1], self.deck.getFirstCard()):
                         card_added = self.deck.takeFirstCard()
                         pile.addCard(card_added)
                         if verbose:
                             print("Moving {0} from Deck to Pile".format(str(card_added)))
                         return True
-                else:
-                    print("Pile has cards")
 
             #5: move around cards in playPiles
             for pile1 in self.playPiles:
@@ -143,9 +137,9 @@ if True:
                         if pile2 is not pile1 and len(pile2_flipped_cards)>0:
                             for transfer_cards_size in range(1,len(pile1_flipped_cards)+1):
                                 cards_to_transfer = pile1_flipped_cards[:transfer_cards_size]
-                                if self.checkCardOrder(pile2.cards[0],cards_to_transfer[-1]):
+                                if self.checkCardOrder(pile2.cards[-1],cards_to_transfer[-1]):
                                     if pile2.flipped_count < pile1.flipped_count:
-                                        [pile2.cards.insert(0,card) for card in reversed(cards_to_transfer)]
+                                        [pile2.cards.append(card) for card in reversed(cards_to_transfer)]
                                         pile1.cards = pile1.cards[transfer_cards_size:]
                                         if verbose:
                                             print("Moved {0} cards between piles: {1}".format(
@@ -154,7 +148,7 @@ if True:
                                                                                              ))
                                         return True
                                     elif pile1.flipped_count==0 and len(cards_to_transfer) == len(pile1.cards):
-                                        [pile2.cards.insert(0,card) for card in reversed(cards_to_transfer)]
+                                        [pile2.cards.append(card) for card in reversed(cards_to_transfer)]
                                         pile1.cards = []
                                         if verbose:
                                             print("Moved {0} cards between piles: {1}".format(
@@ -162,8 +156,6 @@ if True:
                                                 ", ".join([str(card) for card in cards_to_transfer])
                                                                                              ))
                                         return True
-                else:
-                    print("Pile has cards")
             return False
 
 

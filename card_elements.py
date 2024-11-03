@@ -29,23 +29,22 @@ class Pile:
         self.flipped_count = 0
 
     def addCard(self, card: Card):
-        self.cards.insert(0,card)
+        self.cards.append(card)
         if card.flipped:
             self.flipped_count += 1
 
     def flipFirstCard(self):
         if len(self.cards)>0:
-            self.cards[0].flip()
-            self.flipped_count += 1 if self.cards[0].flipped else -1
+            self.cards[-1].flip()
+            self.flipped_count += 1 if self.cards[-1].flipped else -1
 
     def getFlippedCards(self):
         return [card for card in self.cards if card.flipped]
 
     def __str__(self):
-        returnedCards = [str(card) for card in reversed(self.getFlippedCards())]
-        flippedDownCount = len(self.cards) - len(self.getFlippedCards())
-        if flippedDownCount>0:
-            returnedCards.insert(0,"{0} cards flipped down".format(flippedDownCount))
+        returnedCards = [str(card) for card in self.getFlippedCards()]
+        if self.flipped_count>0:
+            returnedCards.insert(0,"{0} cards flipped down".format(self.flipped_count))
         return ", ".join(returnedCards)
 
 class Deck:
