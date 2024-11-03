@@ -1,44 +1,20 @@
+from typing import Optional
+
 from card_elements import Card, Deck, Pile
 from codecarbon import EmissionsTracker
 import pprint
-import random
-
 
 pp = pprint.PrettyPrinter(indent=4)
 
 
-with EmissionsTracker() as tracker:
+# with EmissionsTracker() as tracker: # type: ignore
+if True:
 
     class Game:
+        colors = ["red", "black"]
+        signs = ["diamond", "spades", "hearts", "clubs"]
 
-        x = "A"
-        y = "2"
-        z = "3"
-        a = "4"
-        b = "5"
-        c = "6"
-        d = "7"
-        e = "8"
-        f = "9"
-        g = "10"
-        h = "J"
-        i = "Q"
-        j = "K"
-
-        color1 = "red"
-        color2 = "black"
-
-        sign1 = "diamond"
-        sign2 = "spades"
-        sign3 = "hearts"
-        sign4 = "clubs"
-
-
-        values = [x, y, z, a, b, c, d, e, f, g, h, i, j]
-        colors = [color1, color2]
-        signs = [sign1, sign2, sign3, sign4]
-
-        list_of_values = values
+        list_of_values = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
         print("The cards in your deck are:")
         for i in list_of_values:
@@ -60,7 +36,7 @@ with EmissionsTracker() as tracker:
         def __init__(self):
             self.list_of_cards = [Card(value, suit) for value in range(1, 14) for suit in ["Diamonds", "Hearts", "Clubs", "Spades"]]
             self.deck = Deck(self.list_of_values,self.suits)
-            self.playPiles = []
+            self.playPiles: list[Pile] = []
             for i in range(self.numPlayPiles):
                 thisPile = Pile()
                 [thisPile.addCard(self.deck.takeFirstCard(flip=False)) for j in range(i+1)]
@@ -88,7 +64,7 @@ with EmissionsTracker() as tracker:
             blocksFull = all(len(pile.cards)==13 for suit,pile in self.blockPiles.items())
             return deckEmpty and pilesEmpty and blocksFull
 
-        def addToBlock(self, card):
+        def addToBlock(self, card: Optional[Card]):
             if card is None:
                 return False
             elif len(self.blockPiles[card.suit].cards)>0:
@@ -194,7 +170,7 @@ with EmissionsTracker() as tracker:
             return False
 
 
-        def simulate(self, draw = False, verbose=False):
+        def simulate(self, draw: bool = False, verbose: bool = False):
 
             # clear cache if last turn was not card draw
             if not draw:
