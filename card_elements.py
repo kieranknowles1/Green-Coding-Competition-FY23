@@ -25,14 +25,18 @@ class Card:
 class Pile:
 
     def __init__(self):
-        self.cards = []
+        self.cards: list[Card] = []
+        self.flipped_count = 0
 
-    def addCard(self, Card):
-        self.cards.insert(0,Card)
+    def addCard(self, card: Card):
+        self.cards.insert(0,card)
+        if card.flipped:
+            self.flipped_count += 1
 
     def flipFirstCard(self):
         if len(self.cards)>0:
             self.cards[0].flip()
+            self.flipped_count += 1 if self.cards[0].flipped else -1
 
     def getFlippedCards(self):
         return [card for card in self.cards if card.flipped]

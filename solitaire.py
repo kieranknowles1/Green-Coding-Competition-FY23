@@ -1,7 +1,7 @@
 from typing import Optional
 
 from card_elements import Card, Deck, Pile
-from codecarbon import EmissionsTracker # type: ignore
+# from codecarbon import EmissionsTracker # type: ignore
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -80,7 +80,9 @@ if True:
         def takeTurn(self, verbose: bool = False):
 
             #Pre: flip up unflipped pile end cards -> do this automatically
-            [pile.cards[0].flip() for pile in self.playPiles if len(pile.cards)>0 and not pile.cards[0].flipped]
+            for pile in self.playPiles:
+                if len(pile.cards) and pile.cards[0].flipped == False:
+                    pile.flipFirstCard()
 
             #1: check if there are any play pile cards you can play to block piles
             for pile in self.playPiles:
@@ -142,9 +144,7 @@ if True:
                             for transfer_cards_size in range(1,len(pile1_flipped_cards)+1):
                                 cards_to_transfer = pile1_flipped_cards[:transfer_cards_size]
                                 if self.checkCardOrder(pile2.cards[0],cards_to_transfer[-1]):
-                                    pile1_downcard_count = len(pile1.cards) - len(pile1_flipped_cards)
-                                    pile2_downcard_count = len(pile2.cards) - len(pile2_flipped_cards)
-                                    if pile2_downcard_count < pile1_downcard_count:
+                                    if pile2.flipped_count < pile1.flipped_count:
                                         [pile2.cards.insert(0,card) for card in reversed(cards_to_transfer)]
                                         pile1.cards = pile1.cards[transfer_cards_size:]
                                         if verbose:
@@ -153,7 +153,7 @@ if True:
                                                 ", ".join([str(card) for card in cards_to_transfer])
                                                                                              ))
                                         return True
-                                    elif pile1_downcard_count==0 and len(cards_to_transfer) == len(pile1.cards):
+                                    elif pile1.flipped_count==0 and len(cards_to_transfer) == len(pile1.cards):
                                         [pile2.cards.insert(0,card) for card in reversed(cards_to_transfer)]
                                         pile1.cards = []
                                         if verbose:
@@ -207,20 +207,19 @@ if True:
                 print(card)
 
     def main():
+        for _ in range(1, 100):
+            thisGame = Game()
+            thisGame.simulate(verbose=True)
+            print()
+            pp.pprint(thisGame.getGameElements())
+            print()
+            if(thisGame.checkIfCompleted()):
+                print("Congrats! You won!")
+            else:
+                print("Sorry, you did not win")
 
-        thisGame = Game()
-        thisGame.simulate(verbose=True)
-        print()
-        pp.pprint(thisGame.getGameElements())
-        print()
-        if(thisGame.checkIfCompleted()):
-            print("Congrats! You won!")
-        else:
-            print("Sorry, you did not win")
-
-        sorted_cards = thisGame.sort()
-        print("Sorted cards:", sorted_cards)
-        return
+            sorted_cards = thisGame.sort()
+            print("Sorted cards:", sorted_cards)
 
     main()
 
